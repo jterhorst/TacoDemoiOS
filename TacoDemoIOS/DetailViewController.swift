@@ -26,6 +26,7 @@ class DetailViewController: UIViewController {
             if let label = self.detailDescriptionLabel {
                 label.text = detail.valueForKey("name") as? String;
             }
+            self.title = detail.valueForKey("name") as? String;
         }
     }
 
