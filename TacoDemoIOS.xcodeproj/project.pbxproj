@@ -16,6 +16,9 @@
 		5851A8A91CA1AD6300E3CE46 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5851A8A71CA1AD6300E3CE46 /* LaunchScreen.storyboard */; };
 		5851A8B41CA1AD6300E3CE46 /* TacoDemoIOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5851A8B31CA1AD6300E3CE46 /* TacoDemoIOSTests.swift */; };
 		5851A8BF1CA1AD6300E3CE46 /* TacoDemoIOSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5851A8BE1CA1AD6300E3CE46 /* TacoDemoIOSUITests.swift */; };
+		58C4BD8A1CA21AFB00BE7E5A /* TacosWebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C4BD891CA21AFB00BE7E5A /* TacosWebService.swift */; };
+		58C4BD8D1CA21E7700BE7E5A /* Taco+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C4BD8B1CA21E7700BE7E5A /* Taco+CoreDataProperties.swift */; };
+		58C4BD8E1CA21E7700BE7E5A /* Taco.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C4BD8C1CA21E7700BE7E5A /* Taco.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +54,9 @@
 		5851A8BA1CA1AD6300E3CE46 /* TacoDemoIOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TacoDemoIOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5851A8BE1CA1AD6300E3CE46 /* TacoDemoIOSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TacoDemoIOSUITests.swift; sourceTree = "<group>"; };
 		5851A8C01CA1AD6300E3CE46 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		58C4BD891CA21AFB00BE7E5A /* TacosWebService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TacosWebService.swift; sourceTree = "<group>"; };
+		58C4BD8B1CA21E7700BE7E5A /* Taco+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Taco+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		58C4BD8C1CA21E7700BE7E5A /* Taco.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Taco.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +87,8 @@
 		5851A88D1CA1AD6300E3CE46 = {
 			isa = PBXGroup;
 			children = (
+				58C4BD8B1CA21E7700BE7E5A /* Taco+CoreDataProperties.swift */,
+				58C4BD8C1CA21E7700BE7E5A /* Taco.swift */,
 				5851A8981CA1AD6300E3CE46 /* TacoDemoIOS */,
 				5851A8B21CA1AD6300E3CE46 /* TacoDemoIOSTests */,
 				5851A8BD1CA1AD6300E3CE46 /* TacoDemoIOSUITests */,
@@ -109,6 +117,7 @@
 				5851A8A71CA1AD6300E3CE46 /* LaunchScreen.storyboard */,
 				5851A8AA1CA1AD6300E3CE46 /* Info.plist */,
 				5851A89B1CA1AD6300E3CE46 /* TacoDemoIOS.xcdatamodeld */,
+				58C4BD891CA21AFB00BE7E5A /* TacosWebService.swift */,
 			);
 			path = TacoDemoIOS;
 			sourceTree = "<group>";
@@ -264,8 +273,11 @@
 			files = (
 				5851A89A1CA1AD6300E3CE46 /* AppDelegate.swift in Sources */,
 				5851A89D1CA1AD6300E3CE46 /* TacoDemoIOS.xcdatamodeld in Sources */,
+				58C4BD8D1CA21E7700BE7E5A /* Taco+CoreDataProperties.swift in Sources */,
 				5851A89F1CA1AD6300E3CE46 /* MasterViewController.swift in Sources */,
+				58C4BD8E1CA21E7700BE7E5A /* Taco.swift in Sources */,
 				5851A8A11CA1AD6300E3CE46 /* DetailViewController.swift in Sources */,
+				58C4BD8A1CA21AFB00BE7E5A /* TacosWebService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -492,6 +504,7 @@
 				5851A8C51CA1AD6300E3CE46 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5851A8C61CA1AD6300E3CE46 /* Build configuration list for PBXNativeTarget "TacoDemoIOSTests" */ = {
 			isa = XCConfigurationList;
@@ -500,6 +513,7 @@
 				5851A8C81CA1AD6300E3CE46 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5851A8C91CA1AD6300E3CE46 /* Build configuration list for PBXNativeTarget "TacoDemoIOSUITests" */ = {
 			isa = XCConfigurationList;
@@ -508,6 +522,7 @@
 				5851A8CB1CA1AD6300E3CE46 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
