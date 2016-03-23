@@ -19,6 +19,7 @@
 		58C4BD8A1CA21AFB00BE7E5A /* TacosWebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C4BD891CA21AFB00BE7E5A /* TacosWebService.swift */; };
 		58C4BD8D1CA21E7700BE7E5A /* Taco+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C4BD8B1CA21E7700BE7E5A /* Taco+CoreDataProperties.swift */; };
 		58C4BD8E1CA21E7700BE7E5A /* Taco.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C4BD8C1CA21E7700BE7E5A /* Taco.swift */; };
+		58E797C21CA303DF00B63EF0 /* TacosDAO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58E797C11CA303DF00B63EF0 /* TacosDAO.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 		58C4BD891CA21AFB00BE7E5A /* TacosWebService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TacosWebService.swift; sourceTree = "<group>"; };
 		58C4BD8B1CA21E7700BE7E5A /* Taco+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Taco+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		58C4BD8C1CA21E7700BE7E5A /* Taco.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Taco.swift; sourceTree = "<group>"; };
+		58E797C11CA303DF00B63EF0 /* TacosDAO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TacosDAO.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 				5851A8AA1CA1AD6300E3CE46 /* Info.plist */,
 				5851A89B1CA1AD6300E3CE46 /* TacoDemoIOS.xcdatamodeld */,
 				58C4BD891CA21AFB00BE7E5A /* TacosWebService.swift */,
+				58E797C11CA303DF00B63EF0 /* TacosDAO.swift */,
 			);
 			path = TacoDemoIOS;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 				58C4BD8E1CA21E7700BE7E5A /* Taco.swift in Sources */,
 				5851A8A11CA1AD6300E3CE46 /* DetailViewController.swift in Sources */,
 				58C4BD8A1CA21AFB00BE7E5A /* TacosWebService.swift in Sources */,
+				58E797C21CA303DF00B63EF0 /* TacosDAO.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

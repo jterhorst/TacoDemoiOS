@@ -13,8 +13,8 @@ class TacosWebService {
 
 	func getTacos(moc: NSManagedObjectContext, completion: (result: Array<Taco>) -> Void) {
 
-		let req = NSURLRequest(URL: NSURL(string: "http://tacodemo.herokuapp.com/tacos.json")!)
-		let session = NSURLSession.sharedSession()//(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
+		let req = NSURLRequest(URL: NSURL(string: "https://tacodemo.herokuapp.com/tacos.json")!)
+		let session = NSURLSession.sharedSession()
 		let task = session.dataTaskWithRequest(req, completionHandler: {(data, response, error) in
 			if (error != nil) {
 				completion(result: Array())
@@ -23,9 +23,17 @@ class TacosWebService {
 					let child_moc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
 					child_moc.parentContext = moc
 					let results = self.parseTacosFromData(data!, moc: moc)
-					dispatch_async(dispatch_get_main_queue()) {
-						completion(result: results)
-					}
+                    do {
+                        try child_moc.save()
+                        dispatch_async(dispatch_get_main_queue()) {
+                            completion(result: results)
+                        }
+                    } catch _ {
+                        dispatch_async(dispatch_get_main_queue()) {
+                            completion(result: Array())
+                        }
+                    }
+					
 				}
 
 			}

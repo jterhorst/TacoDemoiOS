@@ -31,6 +31,12 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func viewWillAppear(animated: Bool) {
         self.clearsSelectionOnViewWillAppear = self.splitViewController!.collapsed
         super.viewWillAppear(animated)
+        
+        let service = TacosWebService()
+        service.getTacos(managedObjectContext!) {
+            (result: Array<Taco>) in
+            print("got result: \(result)")
+        }
     }
 
     override func didReceiveMemoryWarning() {
