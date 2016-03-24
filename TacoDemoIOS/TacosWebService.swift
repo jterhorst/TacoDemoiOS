@@ -42,6 +42,76 @@ class TacosWebService {
 		task.resume()
 	}
 
+	func destroyTaco(taco: Taco, completion: (error: ErrorType?) -> Void) {
+		if let tacoId = taco.remoteId {
+			let req = NSMutableURLRequest(URL: NSURL(string: "https://tacodemo.herokuapp.com/tacos/\(tacoId.stringValue).json")!)
+			req.HTTPMethod = "DELETE"
+			req.allHTTPHeaderFields!["Content-Type"] = "application/json"
+			let session = NSURLSession.sharedSession()
+			let task = session.dataTaskWithRequest(req, completionHandler: {(data, response, error) in
+				if let err = error {
+					completion(error: err)
+				} else {
+					completion(error: nil)
+				}
+			});
+
+			task.resume()
+		}
+	}
+
+	func createTaco(taco: Taco, moc: NSManagedObjectContext, completion: (error: ErrorType?) -> Void) {
+		let req = NSMutableURLRequest(URL: NSURL(string: "https://tacodemo.herokuapp.com/tacos.json")!)
+		req.HTTPMethod = "POST"
+		let payload = ["taco": taco.dictionaryRepresentation()]
+		print("payload: \(payload)")
+		do {
+			req.HTTPBody = try NSJSONSerialization.dataWithJSONObject(payload, options: [])
+		} catch _ {
+			return
+		}
+		req.allHTTPHeaderFields!["Content-Type"] = "application/json"
+		let session = NSURLSession.sharedSession()
+		let task = session.dataTaskWithRequest(req, completionHandler: {(data, response, error) in
+			do {
+				let jsonDict = try NSJSONSerialization.JSONObjectWithData(data!, options: []) as! [String: AnyObject]
+				print("response: \(jsonDict)")
+				taco.updateWithDictionary(jsonDict)
+				try moc.save()
+
+			} catch _ {
+
+			}
+
+			if let err = error {
+				completion(error: err)
+			} else {
+				completion(error: nil)
+			}
+		});
+
+		task.resume()
+	}
+
+	func updateTaco(taco: Taco, completion: (error: ErrorType?) -> Void) {
+		let req = NSMutableURLRequest(URL: NSURL(string: "https://tacodemo.herokuapp.com/tacos.json")!)
+		req.HTTPMethod = "PUT"
+		let payload = ["taco": taco.dictionaryRepresentation()]
+		print("payload: \(payload)")
+		do {
+			req.HTTPBody = try NSJSONSerialization.dataWithJSONObject(payload, options: [])
+		} catch _ {
+			return
+		}
+		req.allHTTPHeaderFields!["Content-Type"] = "application/json"
+		let session = NSURLSession.sharedSession()
+		let task = session.dataTaskWithRequest(req, completionHandler: {(data, response, error) in
+			completion(error: (error)!)
+		});
+
+		task.resume()
+	}
+	
 	func parseTacosFromData(data: NSData, moc: NSManagedObjectContext) -> Array<Taco> {
 
 		var resultingTacos = Array<Taco> ()

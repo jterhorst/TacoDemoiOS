@@ -49,13 +49,18 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         let entity = self.fetchedResultsController.fetchRequest.entity!
         let newManagedObject = NSEntityDescription.insertNewObjectForEntityForName(entity.name!, inManagedObjectContext: context) as! Taco
              
-        // If appropriate, configure the new managed object.
-        // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
         newManagedObject.name = "New Taco"
              
         // Save the context.
         do {
             try context.save()
+			let service = TacosWebService()
+			service.createTaco(newManagedObject, moc: context) {
+				(error: ErrorType?) in
+				if (error != nil) {
+					print("error: \(error)")
+				}
+			};
         } catch {
             // Replace this implementation with code to handle the error appropriately.
             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
@@ -103,7 +108,14 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             let context = self.fetchedResultsController.managedObjectContext
-            context.deleteObject(self.fetchedResultsController.objectAtIndexPath(indexPath) as! NSManagedObject)
+			let service = TacosWebService()
+			service.destroyTaco(self.fetchedResultsController.objectAtIndexPath(indexPath) as! Taco) {
+				(error: ErrorType?) in
+				if (error != nil) {
+					print("error: \(error)")
+				}
+			};
+			context.deleteObject(self.fetchedResultsController.objectAtIndexPath(indexPath) as! Taco)
                 
             do {
                 try context.save()
@@ -118,7 +130,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     func configureCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
         let object = self.fetchedResultsController.objectAtIndexPath(indexPath)
-        cell.textLabel!.text = object.valueForKey("name") as? String;
+		cell.textLabel!.text = object.valueForKey("name") as? String
     }
 
     // MARK: - Fetched results controller

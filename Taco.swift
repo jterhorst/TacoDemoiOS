@@ -39,4 +39,19 @@ class Taco: NSManagedObject {
 		}
 	}
 
+	func dictionaryRepresentation() -> Dictionary<String, AnyObject> {
+		var dict = Dictionary<String, AnyObject>()
+		if self.remoteId != nil && self.remoteId?.integerValue > 0 {
+			dict["id"] = self.remoteId
+		}
+		dict["name"] = self.name
+		dict["meat"] = self.meat
+		dict["layers"] = self.layers
+		dict["calories"] = self.calories
+		dict["has_cheese"] = self.hasCheese
+		dict["has_lettuce"] = self.hasLettuce
+		dict["details"] = self.details
+		return dict
+	}
+
 }

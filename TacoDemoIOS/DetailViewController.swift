@@ -10,8 +10,12 @@ import UIKit
 
 class DetailViewController: UIViewController {
 
-    @IBOutlet weak var detailDescriptionLabel: UILabel!
-
+    @IBOutlet weak var caloriesValueLabel: UILabel!
+	@IBOutlet weak var detailsValueLabel: UILabel!
+	@IBOutlet weak var hasCheeseValueLabel: UILabel!
+	@IBOutlet weak var hasLettuceValueLabel: UILabel!
+	@IBOutlet weak var layersValueLabel: UILabel!
+	@IBOutlet weak var meatValueLabel: UILabel!
 
     var detailItem: Taco? {
         didSet {
@@ -23,9 +27,32 @@ class DetailViewController: UIViewController {
     func configureView() {
         // Update the user interface for the detail item.
         if let detail = self.detailItem {
-            if let label = self.detailDescriptionLabel {
-                label.text = detail.name
-            }
+			if let caloriesLabel = self.caloriesValueLabel {
+				caloriesLabel.text = detail.calories?.stringValue
+			}
+			if let detailsLabel = self.detailsValueLabel {
+				detailsLabel.text = detail.details
+			}
+			if let hasCheeseLabel = self.hasCheeseValueLabel {
+				if detail.hasCheese?.boolValue == true {
+					hasCheeseLabel.text = "Yes"
+				} else {
+					hasCheeseLabel.text = "No"
+				}
+			}
+			if let hasLettuceLabel = self.hasLettuceValueLabel {
+				if detail.hasLettuce?.boolValue == true {
+					hasLettuceLabel.text = "Yes"
+				} else {
+					hasLettuceLabel.text = "No"
+				}
+			}
+			if let layersLabel = self.layersValueLabel {
+				layersLabel.text = detail.layers?.stringValue
+			}
+			if let meatLabel = self.meatValueLabel {
+				meatLabel.text = detail.meat
+			}
             self.title = detail.valueForKey("name") as? String;
         }
     }
