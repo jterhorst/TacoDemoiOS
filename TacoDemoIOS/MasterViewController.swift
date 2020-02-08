@@ -18,9 +18,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        self.navigationItem.leftBarButtonItem = self.editButtonItem()
+        self.navigationItem.leftBarButtonItem = self.editButtonItem
 
-        let addButton = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "insertNewObject:")
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: Selector(("insertNewObject:")))
         self.navigationItem.rightBarButtonItem = addButton
         if let split = self.splitViewController {
             let controllers = split.viewControllers
@@ -28,12 +28,12 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         }
     }
 
-    override func viewWillAppear(animated: Bool) {
-        self.clearsSelectionOnViewWillAppear = self.splitViewController!.collapsed
+    override func viewWillAppear(_ animated: Bool) {
+        self.clearsSelectionOnViewWillAppear = self.splitViewController!.isCollapsed
         super.viewWillAppear(animated)
         
         let service = TacosWebService()
-        service.getTacos(managedObjectContext!) {
+        service.getTacos(moc: managedObjectContext!) {
             (result: Array<Taco>) in
             print("got result: \(result)")
         }
@@ -47,7 +47,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     func insertNewObject(sender: AnyObject) {
         let context = self.fetchedResultsController.managedObjectContext
         let entity = self.fetchedResultsController.fetchRequest.entity!
-        let newManagedObject = NSEntityDescription.insertNewObjectForEntityForName(entity.name!, inManagedObjectContext: context) as! Taco
+        let newManagedObject = NSEntityDescription.insertNewObject(forEntityName: entity.name!, into: context) as! Taco
              
         newManagedObject.name = "New Taco"
              
@@ -55,10 +55,10 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         do {
             try context.save()
 			let service = TacosWebService()
-			service.createTaco(newManagedObject, moc: context) {
-				(error: ErrorType?) in
+            service.createTaco(taco: newManagedObject, moc: context) {
+				(error: Error?) in
 				if (error != nil) {
-					print("error: \(error)")
+                    print("error: \(String(describing: error))")
 				}
 			};
         } catch {
@@ -71,13 +71,13 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     // MARK: - Segues
 
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow {
-            let object = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Taco
-                let controller = (segue.destinationViewController as! UINavigationController).topViewController as! DetailViewController
+                let object = self.fetchedResultsController.object(at: indexPath) as! Taco
+                let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = object
-                controller.navigationItem.leftBarButtonItem = self.splitViewController?.displayModeButtonItem()
+                controller.navigationItem.leftBarButtonItem = self.splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
         }
@@ -85,37 +85,37 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     // MARK: - Table View
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return self.fetchedResultsController.sections?.count ?? 0
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let sectionInfo = self.fetchedResultsController.sections![section]
         return sectionInfo.numberOfObjects
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
-        self.configureCell(cell, atIndexPath: indexPath)
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath as IndexPath)
+        self.configureCell(cell: cell, atIndexPath: indexPath)
         return cell
     }
 
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
 
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
             let context = self.fetchedResultsController.managedObjectContext
 			let service = TacosWebService()
-			service.destroyTaco(self.fetchedResultsController.objectAtIndexPath(indexPath) as! Taco) {
-				(error: ErrorType?) in
+            service.destroyTaco(taco: self.fetchedResultsController.object(at: indexPath) as! Taco) {
+				(error: Error?) in
 				if (error != nil) {
-					print("error: \(error)")
+                    print("error: \(String(describing: error))")
 				}
 			};
-			context.deleteObject(self.fetchedResultsController.objectAtIndexPath(indexPath) as! Taco)
+            context.delete(self.fetchedResultsController.object(at: indexPath) as! Taco)
                 
             do {
                 try context.save()
@@ -128,21 +128,21 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         }
     }
 
-    func configureCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
-        let object = self.fetchedResultsController.objectAtIndexPath(indexPath)
-		cell.textLabel!.text = object.valueForKey("name") as? String
+    func configureCell(cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
+        let object = self.fetchedResultsController.object(at: indexPath) as? Taco
+        cell.textLabel!.text = object?.name
     }
 
     // MARK: - Fetched results controller
 
-    var fetchedResultsController: NSFetchedResultsController {
+    var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult> {
         if _fetchedResultsController != nil {
             return _fetchedResultsController!
         }
         
-        let fetchRequest = NSFetchRequest()
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         // Edit the entity name as appropriate.
-        let entity = NSEntityDescription.entityForName("Taco", inManagedObjectContext: self.managedObjectContext!)
+        let entity = NSEntityDescription.entity(forEntityName: "Taco", in: self.managedObjectContext!)
         fetchRequest.entity = entity
         
         // Set the batch size to a suitable number.
@@ -170,38 +170,38 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         
         return _fetchedResultsController!
     }    
-    var _fetchedResultsController: NSFetchedResultsController? = nil
+    var _fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>? = nil
 
-    func controllerWillChangeContent(controller: NSFetchedResultsController) {
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         self.tableView.beginUpdates()
     }
 
-    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+    func controller(controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
         switch type {
-            case .Insert:
-                self.tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Fade)
-            case .Delete:
-                self.tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Fade)
+        case .insert:
+            self.tableView.insertSections(IndexSet(integer: sectionIndex), with: .fade)
+        case .delete:
+            self.tableView.deleteSections(IndexSet(integer: sectionIndex), with: .fade)
             default:
                 return
         }
     }
 
-    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+    private func controller(controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeObject anObject: AnyObject, atIndexPath indexPath: IndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
-            case .Insert:
-                tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
-            case .Delete:
-                tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
-            case .Update:
-                self.configureCell(tableView.cellForRowAtIndexPath(indexPath!)!, atIndexPath: indexPath!)
-            case .Move:
-                tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
-                tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
+        case .insert:
+            tableView.insertRows(at: [newIndexPath!], with: .fade)
+        case .delete:
+            tableView.deleteRows(at: [indexPath!], with: .fade)
+        case .update:
+            self.configureCell(cell: tableView.cellForRow(at: indexPath!)!, atIndexPath: indexPath!)
+        case .move:
+            tableView.deleteRows(at: [indexPath!], with: .fade)
+            tableView.insertRows(at: [newIndexPath!], with: .fade)
         }
     }
 
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         self.tableView.endUpdates()
     }
 

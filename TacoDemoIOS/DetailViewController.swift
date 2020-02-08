@@ -53,7 +53,7 @@ class DetailViewController: UIViewController {
 			if let meatLabel = self.meatValueLabel {
 				meatLabel.text = detail.meat
 			}
-            self.title = detail.valueForKey("name") as? String;
+            self.title = detail.value(forKey: "name") as? String;
         }
     }
 	

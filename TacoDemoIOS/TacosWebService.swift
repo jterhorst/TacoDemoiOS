@@ -11,26 +11,25 @@ import CoreData
 
 class TacosWebService {
 
-	func getTacos(moc: NSManagedObjectContext, completion: (result: Array<Taco>) -> Void) {
+    func getTacos(moc: NSManagedObjectContext, completion: @escaping (_ result: Array<Taco>) -> Void) {
 
-		let req = NSURLRequest(URL: NSURL(string: "https://tacodemo.herokuapp.com/tacos.json")!)
-		let session = NSURLSession.sharedSession()
-		let task = session.dataTaskWithRequest(req, completionHandler: {(data, response, error) in
+		let req = URLRequest(url: URL(string: "https://tacodemo.herokuapp.com/tacos.json")!)
+        let task = URLSession.shared.dataTask(with: req, completionHandler: {(data, response, error) in
 			if (error != nil) {
-				completion(result: Array())
+                completion(Array())
 			} else {
-				dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-					let child_moc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
-					child_moc.parentContext = moc
-					let results = self.parseTacosFromData(data!, moc: moc)
+                DispatchQueue.global(qos: .background).async {
+                    let child_moc = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+					child_moc.parent = moc
+                    let results = self.parseTacosFromData(data: data!, moc: moc)
                     do {
                         try child_moc.save()
-                        dispatch_async(dispatch_get_main_queue()) {
-                            completion(result: results)
+                        DispatchQueue.main.async {
+                            completion(results)
                         }
                     } catch _ {
-                        dispatch_async(dispatch_get_main_queue()) {
-                            completion(result: Array())
+                        DispatchQueue.main.async {
+                            completion(Array())
                         }
                     }
 					
@@ -42,17 +41,16 @@ class TacosWebService {
 		task.resume()
 	}
 
-	func destroyTaco(taco: Taco, completion: (error: ErrorType?) -> Void) {
+    func destroyTaco(taco: Taco, completion: @escaping (_ error: Error?) -> Void) {
 		if let tacoId = taco.remoteId {
-			let req = NSMutableURLRequest(URL: NSURL(string: "https://tacodemo.herokuapp.com/tacos/\(tacoId.stringValue).json")!)
-			req.HTTPMethod = "DELETE"
+            var req = URLRequest(url: URL(string: "https://tacodemo.herokuapp.com/tacos/\(tacoId.stringValue).json")!)
+			req.httpMethod = "DELETE"
 			req.allHTTPHeaderFields!["Content-Type"] = "application/json"
-			let session = NSURLSession.sharedSession()
-			let task = session.dataTaskWithRequest(req, completionHandler: {(data, response, error) in
+            let task = URLSession.shared.dataTask(with: req, completionHandler: {(data, response, error) in
 				if let err = error {
-					completion(error: err)
+                    completion(err)
 				} else {
-					completion(error: nil)
+                    completion(nil)
 				}
 			});
 
@@ -60,23 +58,22 @@ class TacosWebService {
 		}
 	}
 
-	func createTaco(taco: Taco, moc: NSManagedObjectContext, completion: (error: ErrorType?) -> Void) {
-		let req = NSMutableURLRequest(URL: NSURL(string: "https://tacodemo.herokuapp.com/tacos.json")!)
-		req.HTTPMethod = "POST"
+    func createTaco(taco: Taco, moc: NSManagedObjectContext, completion: @escaping (_ error: Error?) -> Void) {
+        var req = URLRequest(url: URL(string: "https://tacodemo.herokuapp.com/tacos.json")!)
+		req.httpMethod = "POST"
 		let payload = ["taco": taco.dictionaryRepresentation()]
 		print("payload: \(payload)")
 		do {
-			req.HTTPBody = try NSJSONSerialization.dataWithJSONObject(payload, options: [])
+            req.httpBody = try JSONSerialization.data(withJSONObject: payload, options: [])
 		} catch _ {
 			return
 		}
 		req.allHTTPHeaderFields!["Content-Type"] = "application/json"
-		let session = NSURLSession.sharedSession()
-		let task = session.dataTaskWithRequest(req, completionHandler: {(data, response, error) in
+        let task = URLSession.shared.dataTask(with: req, completionHandler: {(data, response, error) in
 			do {
-				let jsonDict = try NSJSONSerialization.JSONObjectWithData(data!, options: []) as! [String: AnyObject]
+                let jsonDict = try JSONSerialization.jsonObject(with: data!, options: []) as! [String: AnyObject]
 				print("response: \(jsonDict)")
-				taco.updateWithDictionary(jsonDict)
+                taco.updateWithDictionary(json: jsonDict)
 				try moc.save()
 
 			} catch _ {
@@ -84,54 +81,53 @@ class TacosWebService {
 			}
 
 			if let err = error {
-				completion(error: err)
+                completion(err)
 			} else {
-				completion(error: nil)
+                completion(nil)
 			}
 		});
 
 		task.resume()
 	}
 
-	func updateTaco(taco: Taco, completion: (error: ErrorType?) -> Void) {
-		let req = NSMutableURLRequest(URL: NSURL(string: "https://tacodemo.herokuapp.com/tacos.json")!)
-		req.HTTPMethod = "PUT"
+    func updateTaco(taco: Taco, completion: @escaping (_ error: Error?) -> Void) {
+        var req = URLRequest(url: URL(string: "https://tacodemo.herokuapp.com/tacos.json")!)
+		req.httpMethod = "PUT"
 		let payload = ["taco": taco.dictionaryRepresentation()]
 		print("payload: \(payload)")
 		do {
-			req.HTTPBody = try NSJSONSerialization.dataWithJSONObject(payload, options: [])
+            req.httpBody = try JSONSerialization.data(withJSONObject: payload, options: [])
 		} catch _ {
 			return
 		}
 		req.allHTTPHeaderFields!["Content-Type"] = "application/json"
-		let session = NSURLSession.sharedSession()
-		let task = session.dataTaskWithRequest(req, completionHandler: {(data, response, error) in
-			completion(error: (error)!)
+        let task = URLSession.shared.dataTask(with: req, completionHandler: {(data, response, error) in
+            completion((error)!)
 		});
 
 		task.resume()
 	}
 	
-	func parseTacosFromData(data: NSData, moc: NSManagedObjectContext) -> Array<Taco> {
+	func parseTacosFromData(data: Data, moc: NSManagedObjectContext) -> Array<Taco> {
 
 		var resultingTacos = Array<Taco> ()
 		do {
-			let jsonArray = try NSJSONSerialization.JSONObjectWithData(data, options: []) as! [[String: AnyObject]]
+            let jsonArray = try JSONSerialization.jsonObject(with: data, options: []) as! [[String: AnyObject]]
 			
 			for tacoDict in jsonArray {
-				let fetchRequest = NSFetchRequest()
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
 				// Edit the entity name as appropriate.
-				let entity = NSEntityDescription.entityForName("Taco", inManagedObjectContext: moc)
+                let entity = NSEntityDescription.entity(forEntityName: "Taco", in: moc)
 				fetchRequest.entity = entity
 				fetchRequest.predicate = NSPredicate.init(format: "remoteId = %@", argumentArray: [tacoDict["id"]!])
-				let results = try! moc.executeFetchRequest(fetchRequest)
+                let results = try! moc.fetch(fetchRequest)
 				if results.count > 0 {
 					let existingTaco = results.first as! Taco
-					existingTaco.updateWithDictionary(tacoDict)
+                    existingTaco.updateWithDictionary(json: tacoDict)
 					resultingTacos.append(existingTaco)
 				} else {
-					let newManagedObject = NSEntityDescription.insertNewObjectForEntityForName("Taco", inManagedObjectContext: moc) as! Taco
-					newManagedObject.updateWithDictionary(tacoDict)
+                    let newManagedObject = NSEntityDescription.insertNewObject(forEntityName: "Taco", into: moc) as! Taco
+                    newManagedObject.updateWithDictionary(json: tacoDict)
 					resultingTacos.append(newManagedObject)
 				}
 
