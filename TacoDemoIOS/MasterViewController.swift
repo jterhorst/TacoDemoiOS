@@ -12,7 +12,7 @@ import CoreData
 class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate {
 
     var detailViewController: DetailViewController? = nil
-    var managedObjectContext: NSManagedObjectContext? = nil
+    var managedObjectContext: NSManagedObjectContext = TacosDAO.sharedInstance.managedObjectContext
 
 
     override func viewDidLoad() {
@@ -20,7 +20,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         // Do any additional setup after loading the view, typically from a nib.
         self.navigationItem.leftBarButtonItem = self.editButtonItem
 
-        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: Selector(("insertNewObject:")))
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(insertNewObject(sender:)))
         self.navigationItem.rightBarButtonItem = addButton
         if let split = self.splitViewController {
             let controllers = split.viewControllers
@@ -33,7 +33,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         super.viewWillAppear(animated)
         
         let service = TacosWebService()
-        service.getTacos(moc: managedObjectContext!) {
+        service.getTacos(moc: managedObjectContext) {
             (result: Array<Taco>) in
             print("got result: \(result)")
         }
@@ -44,34 +44,40 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         // Dispose of any resources that can be recreated.
     }
 
-    func insertNewObject(sender: AnyObject) {
-        let context = self.fetchedResultsController.managedObjectContext
+    @objc func insertNewObject(sender: AnyObject) {
         let entity = self.fetchedResultsController.fetchRequest.entity!
-        let newManagedObject = NSEntityDescription.insertNewObject(forEntityName: entity.name!, into: context) as! Taco
+        let newManagedObject = NSEntityDescription.insertNewObject(forEntityName: entity.name!, into: managedObjectContext) as! Taco
              
-        newManagedObject.name = "New Taco"
+        newManagedObject.name = "Soft Taco"
+        newManagedObject.layers = 2
+        newManagedObject.meat = "beef"
+        newManagedObject.calories = 150
+        newManagedObject.details = "A simple soft taco"
+        newManagedObject.hasCheese = true
+        newManagedObject.hasLettuce = true
              
         // Save the context.
         do {
-            try context.save()
-			let service = TacosWebService()
-            service.createTaco(taco: newManagedObject, moc: context) {
-				(error: Error?) in
-				if (error != nil) {
+            try managedObjectContext.save()
+            let service = TacosWebService()
+            service.createTaco(taco: newManagedObject, moc: managedObjectContext) {
+                (error: Error?) in
+                if (error != nil) {
                     print("error: \(String(describing: error))")
-				}
-			};
+                }
+            };
         } catch {
             // Replace this implementation with code to handle the error appropriately.
             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
             //print("Unresolved error \(error), \(error.userInfo)")
             abort()
         }
+        
     }
 
     // MARK: - Segues
 
-    func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow {
                 let object = self.fetchedResultsController.object(at: indexPath) as! Taco
@@ -85,40 +91,39 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     // MARK: - Table View
 
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return self.fetchedResultsController.sections?.count ?? 0
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return self.fetchedResultsController.sections!.count
     }
 
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let sectionInfo = self.fetchedResultsController.sections![section]
         return sectionInfo.numberOfObjects
     }
 
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath as IndexPath)
         self.configureCell(cell: cell, atIndexPath: indexPath)
         return cell
     }
 
-    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: IndexPath) -> Bool {
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let context = self.fetchedResultsController.managedObjectContext
-			let service = TacosWebService()
+            let service = TacosWebService()
             service.destroyTaco(taco: self.fetchedResultsController.object(at: indexPath) as! Taco) {
-				(error: Error?) in
-				if (error != nil) {
+                (error: Error?) in
+                if (error != nil) {
                     print("error: \(String(describing: error))")
-				}
-			};
-            context.delete(self.fetchedResultsController.object(at: indexPath) as! Taco)
-                
+                }
+            };
+            managedObjectContext.delete(self.fetchedResultsController.object(at: indexPath) as! Taco)
+            
             do {
-                try context.save()
+                try managedObjectContext.save()
             } catch {
                 // Replace this implementation with code to handle the error appropriately.
                 // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
@@ -129,90 +134,51 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
 
     func configureCell(cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
-        let object = self.fetchedResultsController.object(at: indexPath) as? Taco
+        let object = fetchedResultsController.object(at: indexPath) as? Taco
         cell.textLabel!.text = object?.name
     }
 
     // MARK: - Fetched results controller
 
     var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult> {
-        if _fetchedResultsController != nil {
-            return _fetchedResultsController!
-        }
         
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-        // Edit the entity name as appropriate.
-        let entity = NSEntityDescription.entity(forEntityName: "Taco", in: self.managedObjectContext!)
-        fetchRequest.entity = entity
-        
-        // Set the batch size to a suitable number.
-        fetchRequest.fetchBatchSize = 20
-        
-        // Edit the sort key as appropriate.
-        let sortDescriptor = NSSortDescriptor(key: "name", ascending: true)
-        
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        
-        // Edit the section name key path and cache name if appropriate.
-        // nil for section name key path means "no sections".
-        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.managedObjectContext!, sectionNameKeyPath: nil, cacheName: "Master")
-        aFetchedResultsController.delegate = self
-        _fetchedResultsController = aFetchedResultsController
-        
-        do {
-            try _fetchedResultsController!.performFetch()
-        } catch {
-             // Replace this implementation with code to handle the error appropriately.
-             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
-             //print("Unresolved error \(error), \(error.userInfo)")
-             abort()
+        if _fetchedResultsController == nil {
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
+            // Edit the entity name as appropriate.
+            let entity = NSEntityDescription.entity(forEntityName: "Taco", in: managedObjectContext)
+            fetchRequest.entity = entity
+            
+            // Set the batch size to a suitable number.
+            fetchRequest.fetchBatchSize = 20
+            
+            // Edit the sort key as appropriate.
+            let sortDescriptor = NSSortDescriptor(key: "name", ascending: true)
+            
+            fetchRequest.sortDescriptors = [sortDescriptor]
+            
+            // Edit the section name key path and cache name if appropriate.
+            // nil for section name key path means "no sections".
+            let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: managedObjectContext, sectionNameKeyPath: nil, cacheName: "Master")
+            aFetchedResultsController.delegate = self
+            _fetchedResultsController = aFetchedResultsController
+            
+            do {
+                try _fetchedResultsController!.performFetch()
+            } catch {
+                 // Replace this implementation with code to handle the error appropriately.
+                 // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                 //print("Unresolved error \(error), \(error.userInfo)")
+                 abort()
+            }
         }
         
         return _fetchedResultsController!
     }    
     var _fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>? = nil
-
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.tableView.beginUpdates()
-    }
-
-    func controller(controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
-        switch type {
-        case .insert:
-            self.tableView.insertSections(IndexSet(integer: sectionIndex), with: .fade)
-        case .delete:
-            self.tableView.deleteSections(IndexSet(integer: sectionIndex), with: .fade)
-            default:
-                return
-        }
-    }
-
-    private func controller(controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeObject anObject: AnyObject, atIndexPath indexPath: IndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        switch type {
-        case .insert:
-            tableView.insertRows(at: [newIndexPath!], with: .fade)
-        case .delete:
-            tableView.deleteRows(at: [indexPath!], with: .fade)
-        case .update:
-            self.configureCell(cell: tableView.cellForRow(at: indexPath!)!, atIndexPath: indexPath!)
-        case .move:
-            tableView.deleteRows(at: [indexPath!], with: .fade)
-            tableView.insertRows(at: [newIndexPath!], with: .fade)
-        }
-    }
-
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.tableView.endUpdates()
-    }
-
-    /*
-     // Implementing the above methods to update the table view in response to individual changes may have performance implications if a large number of changes are made simultaneously. If this proves to be an issue, you can instead just implement controllerDidChangeContent: which notifies the delegate that all section and object changes have been processed.
-     
-     func controllerDidChangeContent(controller: NSFetchedResultsController) {
+    
+     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
          // In the simplest, most efficient, case, reload the table view.
          self.tableView.reloadData()
      }
-     */
-
 }
 

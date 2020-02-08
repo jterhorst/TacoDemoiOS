@@ -13,9 +13,6 @@ import CoreData
 class Taco: NSManagedObject {
 
 	func updateWithDictionary(json: Dictionary<String, AnyObject>) {
-		if let newId = json["id"] as? NSNumber {
-			self.remoteId = newId
-		}
 		if let newName = json["name"] as? String {
 			self.name = newName
 		}
@@ -41,9 +38,6 @@ class Taco: NSManagedObject {
 
 	func dictionaryRepresentation() -> Dictionary<String, AnyObject> {
 		var dict = Dictionary<String, AnyObject>()
-        if let currentId = self.remoteId {
-			dict["id"] = currentId
-		}
         dict["name"] = self.name as AnyObject?
         dict["meat"] = self.meat as AnyObject?
 		dict["layers"] = self.layers

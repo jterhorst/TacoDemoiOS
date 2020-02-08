@@ -23,7 +23,8 @@ class TacosDAO {
 
 	lazy var managedObjectModel: NSManagedObjectModel = {
 		// The managed object model for the application. This property is not optional. It is a fatal error for the application not to be able to find and load its model.
-        let modelURL = Bundle.main.url(forResource: "TacoDemoIOS", withExtension: "momd")!
+        var modelURL = Bundle.main.url(forResource: "TacoDemoIOS", withExtension: "momd")!
+        modelURL.appendPathComponent("TacoDemo 2.mom")
         return NSManagedObjectModel(contentsOf: modelURL)!
 	}()
 
@@ -58,7 +59,7 @@ class TacosDAO {
         var managedObjectContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
 		managedObjectContext.persistentStoreCoordinator = coordinator
 		return managedObjectContext
-	}()
+    }()
 
 	// MARK: - Core Data Saving support
 

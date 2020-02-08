@@ -21,6 +21,6 @@ extension Taco {
     @NSManaged var layers: NSNumber?
     @NSManaged var meat: String?
     @NSManaged var name: String?
-    @NSManaged var remoteId: NSNumber?
+    @NSManaged var remoteId: String?
 
 }
