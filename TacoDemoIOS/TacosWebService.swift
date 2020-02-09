@@ -90,8 +90,9 @@ class TacosWebService {
         let task = URLSession.shared.dataTask(with: req, completionHandler: {(data, response, error) in
 			do {
                 let jsonDict = try JSONSerialization.jsonObject(with: data!, options: []) as! [String: AnyObject]
-				print("response: \(jsonDict)")
-                taco.remoteId = jsonDict["name"] as! String
+                if let tacoRemoteId = jsonDict["name"] as? String {
+                    taco.remoteId = tacoRemoteId
+                }
 				try moc.save()
 
 			} catch _ {
@@ -109,25 +110,31 @@ class TacosWebService {
 	}
 
     func updateTaco(taco: Taco, completion: @escaping (_ error: Error?) -> Void) {
-        var req = URLRequest(url: URL(string: "\(endpointUrl())/tacos.json")!)
-		req.httpMethod = "PUT"
-		let payload = taco.dictionaryRepresentation()
-		print("payload: \(payload)")
-		do {
-            req.httpBody = try JSONSerialization.data(withJSONObject: payload, options: [])
-		} catch _ {
-			return
-		}
-		req.allHTTPHeaderFields!["Content-Type"] = "application/json"
-        let task = URLSession.shared.dataTask(with: req, completionHandler: {(data, response, error) in
-            completion((error)!)
-		});
+        if let tacoId = taco.remoteId {
+            var req = URLRequest(url: URL(string: "\(endpointUrl())/tacos/\(tacoId).json")!)
+            req.httpMethod = "PUT"
+            let payload = taco.dictionaryRepresentation()
+            do {
+                req.httpBody = try JSONSerialization.data(withJSONObject: payload, options: [])
+            } catch _ {
+                return
+            }
+            req.allHTTPHeaderFields!["Content-Type"] = "application/json"
+            let task = URLSession.shared.dataTask(with: req, completionHandler: {(data, response, error) in
+                if (error == nil) {
+                    try! taco.managedObjectContext?.save()
+                }
+                completion(error)
+            });
 
-		task.resume()
+            task.resume()
+        }
+        
 	}
 	
-	func parseTacosFromData(data: Data?, moc: NSManagedObjectContext) -> Array<Taco> {
-
+    // MARK: - parsing
+    
+	private func parseTacosFromData(data: Data?, moc: NSManagedObjectContext) -> Array<Taco> {
 		var resultingTacos = Array<Taco> ()
         if let tacoData = data {
             do {
@@ -135,32 +142,38 @@ class TacosWebService {
                 
                 if let keyedTacoItems = jsonArray {
                     for tacoId in keyedTacoItems.keys {
-                        let tacoPayload = keyedTacoItems[tacoId] as? [String:AnyObject]
-                        
-                        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
-                        // Edit the entity name as appropriate.
-                        let entity = NSEntityDescription.entity(forEntityName: "Taco", in: moc)
-                        fetchRequest.entity = entity
-                        fetchRequest.predicate = NSPredicate.init(format: "remoteId = %@", argumentArray: [tacoId])
-                        let results = try! moc.fetch(fetchRequest)
-                        if results.count > 0 {
-                            let existingTaco = results.first as! Taco
-                            existingTaco.updateWithDictionary(json: tacoPayload!)
-                            resultingTacos.append(existingTaco)
-                        } else {
-                            let newManagedObject = NSEntityDescription.insertNewObject(forEntityName: "Taco", into: moc) as! Taco
-                            newManagedObject.remoteId = tacoId
-                            newManagedObject.updateWithDictionary(json: tacoPayload!)
-                            resultingTacos.append(newManagedObject)
+                        if let tacoPayload = keyedTacoItems[tacoId] as? [String:AnyObject] {
+                            if let tacoResult = parseTacoFromPayload(payload: tacoPayload, tacoId: tacoId, moc: moc) {
+                                resultingTacos.append(tacoResult)
+                            }
                         }
                     }
                 }
-                
             } catch let error {
                 print("JSON Serialization failed. Error: \(error)")
             }
         }
-
 		return resultingTacos
 	}
+    
+    private func parseTacoFromPayload(payload: [String:AnyObject], tacoId:String, moc: NSManagedObjectContext) -> Taco? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
+        // Edit the entity name as appropriate.
+        let entity = NSEntityDescription.entity(forEntityName: "Taco", in: moc)
+        fetchRequest.entity = entity
+        fetchRequest.predicate = NSPredicate.init(format: "remoteId = %@", argumentArray: [tacoId])
+        let results = try! moc.fetch(fetchRequest)
+        let resultingTaco: Taco?
+        
+        if results.count > 0 {
+            resultingTaco = results.first as? Taco
+            resultingTaco?.updateWithDictionary(json: payload)
+        } else {
+            resultingTaco = NSEntityDescription.insertNewObject(forEntityName: "Taco", into: moc) as? Taco
+            resultingTaco?.remoteId = tacoId
+            resultingTaco?.updateWithDictionary(json: payload)
+        }
+        
+        return resultingTaco
+    }
 }

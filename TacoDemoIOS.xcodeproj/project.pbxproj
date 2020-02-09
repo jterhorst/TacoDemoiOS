@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5816431A23EF7C540070DE47 /* Endpoint.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5816431923EF7C540070DE47 /* Endpoint.plist */; };
+		5816431E23EFADD40070DE47 /* EditingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5816431D23EFADD40070DE47 /* EditingViewController.swift */; };
 		5851A89A1CA1AD6300E3CE46 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5851A8991CA1AD6300E3CE46 /* AppDelegate.swift */; };
 		5851A89D1CA1AD6300E3CE46 /* TacoDemoIOS.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5851A89B1CA1AD6300E3CE46 /* TacoDemoIOS.xcdatamodeld */; };
 		5851A89F1CA1AD6300E3CE46 /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5851A89E1CA1AD6300E3CE46 /* MasterViewController.swift */; };
@@ -43,6 +44,8 @@
 /* Begin PBXFileReference section */
 		5816431923EF7C540070DE47 /* Endpoint.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Endpoint.plist; sourceTree = "<group>"; };
 		5816431B23EF8EC70070DE47 /* TacoDemo 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TacoDemo 2.xcdatamodel"; sourceTree = "<group>"; };
+		5816431C23EFA6C90070DE47 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		5816431D23EFADD40070DE47 /* EditingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditingViewController.swift; sourceTree = "<group>"; };
 		5851A8961CA1AD6300E3CE46 /* TacoDemoIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TacoDemoIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5851A8991CA1AD6300E3CE46 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5851A89C1CA1AD6300E3CE46 /* TacoDemoIOS.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TacoDemoIOS.xcdatamodel; sourceTree = "<group>"; };
@@ -92,6 +95,7 @@
 		5851A88D1CA1AD6300E3CE46 = {
 			isa = PBXGroup;
 			children = (
+				5816431C23EFA6C90070DE47 /* README.md */,
 				58C4BD8B1CA21E7700BE7E5A /* Taco+CoreDataProperties.swift */,
 				58C4BD8C1CA21E7700BE7E5A /* Taco.swift */,
 				5851A8981CA1AD6300E3CE46 /* TacoDemoIOS */,
@@ -125,6 +129,7 @@
 				58C4BD891CA21AFB00BE7E5A /* TacosWebService.swift */,
 				58E797C11CA303DF00B63EF0 /* TacosDAO.swift */,
 				5816431923EF7C540070DE47 /* Endpoint.plist */,
+				5816431D23EFADD40070DE47 /* EditingViewController.swift */,
 			);
 			path = TacoDemoIOS;
 			sourceTree = "<group>";
@@ -283,6 +288,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5851A89A1CA1AD6300E3CE46 /* AppDelegate.swift in Sources */,
+				5816431E23EFADD40070DE47 /* EditingViewController.swift in Sources */,
 				5851A89D1CA1AD6300E3CE46 /* TacoDemoIOS.xcdatamodeld in Sources */,
 				58C4BD8D1CA21E7700BE7E5A /* Taco+CoreDataProperties.swift in Sources */,
 				5851A89F1CA1AD6300E3CE46 /* MasterViewController.swift in Sources */,

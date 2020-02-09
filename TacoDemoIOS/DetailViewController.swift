@@ -62,12 +62,22 @@ class DetailViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         self.configureView()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    override func viewDidAppear(_ animated: Bool) {
+        
+        super.viewDidAppear(animated)
+        // Do any additional setup after loading the view, typically from a nib.
+        self.configureView()
     }
-
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showEditor" {
+            if let detail = self.detailItem {
+                let controller = (segue.destination as! UINavigationController).topViewController as! EditingViewController
+                controller.detailItem = detail
+            }
+        }
+    }
 
 }
 
