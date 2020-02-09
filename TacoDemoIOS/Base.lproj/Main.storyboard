@@ -274,11 +274,11 @@
         <!--Split View Controller-->
         <scene sceneID="Nki-YV-4Qg">
             <objects>
-                <splitViewController id="H1p-Uh-vWS" sceneMemberID="viewController">
+                <splitViewController presentsWithGesture="NO" id="H1p-Uh-vWS" sceneMemberID="viewController">
                     <toolbarItems/>
                     <connections>
-                        <segue destination="RMx-3f-FxP" kind="relationship" relationship="masterViewController" id="BlO-5A-QYV"/>
-                        <segue destination="vC3-pB-5Vb" kind="relationship" relationship="detailViewController" id="Tll-UG-LXB"/>
+                        <segue destination="RMx-3f-FxP" kind="relationship" relationship="masterViewController" id="Aln-8U-oe9"/>
+                        <segue destination="vC3-pB-5Vb" kind="relationship" relationship="detailViewController" id="IcB-bF-SQf"/>
                     </connections>
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cZU-Oi-B1e" sceneMemberID="firstResponder"/>
@@ -312,10 +312,7 @@
                                 </tableViewCellContentView>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
-                                    <segue destination="vC3-pB-5Vb" kind="showDetail" identifier="showDetail" id="6S0-TO-JiA">
-                                        <segue key="commit" inheritsFrom="parent" id="TpZ-kx-PJq"/>
-                                        <segue key="preview" inheritsFrom="commit" id="RcP-k1-083"/>
-                                    </segue>
+                                    <segue destination="vC3-pB-5Vb" kind="showDetail" identifier="showDetail" id="y0K-Y0-PKG"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -325,7 +322,7 @@
                             <outlet property="delegate" destination="7bK-jq-Zjz" id="RA6-mI-bju"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Tacos" id="Zdf-7t-Un8"/>
+                    <navigationItem key="navigationItem" title="List of Tacos" id="Zdf-7t-Un8"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>
@@ -349,6 +346,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="Tll-UG-LXB"/>
+        <segue reference="y0K-Y0-PKG"/>
     </inferredMetricsTieBreakers>
 </document>
